@@ -1,6 +1,30 @@
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid';
+import { useState } from 'react';
 
 export default function ClozeForm() {
+    const [inputFields, setInputFields] = useState([{ value: '' }]);
+    const handleInputChange = (index, value) => {
+        const newInputFields = [...inputFields];
+        newInputFields[index].value = value;
+        setInputFields(newInputFields);
+    };
+
+    const handleAddInput = () => {
+        setInputFields([...inputFields, { value: '' }]);
+    };
+
+    const handleRemoveInput = index => {
+        const newInputFields = [...inputFields];
+        newInputFields.splice(index, 1);
+        setInputFields(newInputFields);
+    };
+    const [selectedFile, setSelectedFile] = useState(null);
+
+    const handleFileChange = event => {
+        const file = event.target.files[0];
+        setSelectedFile(file);
+    };
+
     return (
         <>
             <div className="my-10 relative max-w-lg mx-auto border rounded border-indigo-400 p-5 m">
@@ -53,34 +77,57 @@ export default function ClozeForm() {
                     </div>
                     <div className=" mt-2">
 
-                    <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
-                          Options
+                        <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
+                            Options
                         </label>
-                        <div className="mt-2 flex items-center ">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 cursor-grabbing me-2 h-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
-                                </svg>
-                                <div class="flex">
-                                    <input id="candidates" name="candidates" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 me-2 " />
+
+                        {inputFields.map((input, index) => (
+                            <div key={index}>
+                                <div className="mt-2 flex items-center ">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 cursor-grabbing me-2 h-6">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
+                                    </svg>
+                                    <div class="flex">
+                                        <input id="candidates" name="candidates" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 me-2 " />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        name="first-name"
+                                        id="first-name"
+                                        autoComplete="given-name"
+                                        value={input.value}
+                                        onChange={e => {
+                                            const newInputFields = [...inputFields];
+                                            newInputFields[index].value = e.target.value;
+                                            setInputFields(newInputFields);
+                                        }}
+                                        className="block w-full rounded-md border-0 outline-0 p-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    />
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ms-2 cursor-pointer" onClick={() => handleRemoveInput(index)}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
                                 </div>
-                                <input
-                                    type="text"
-                                    name="first-name"
-                                    id="first-name"
-                                    autoComplete="given-name"
-                                    className="block w-full rounded-md border-0 outline-0 p-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                />
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ms-2">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-
-
                             </div>
-
-                        <h5 class="text-indigo-600 font-semibold mt-2 text-sm leading-6 cursor-pointer ">+ Add New Option</h5>
+                        ))}
+                        <h5 class="text-indigo-600 font-semibold mt-2 text-sm leading-6 cursor-pointer " onClick={() => {
+                            setInputFields([...inputFields, { value: '' }]);
+                        }} >+ Add New Option</h5>
                     </div>
 
-
+                    <div className="flex flex-col items-center mt-4">
+                        <label className="text-lg font-medium mb-2">Choose an Image:</label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="py-2 px-4 bg-gray-200 rounded-lg shadow-md hover:bg-gray-300 cursor-pointer"
+                        />
+                        {selectedFile && (
+                            <div className="mt-2">
+                                <p className="text-green-500">{selectedFile.name} selected</p>
+                            </div>
+                        )}
+                    </div>
                     <div className="col-span-full">
                         <label htmlFor="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">
                             Upload Image
@@ -104,7 +151,7 @@ export default function ClozeForm() {
                     </div>
                 </div>
                 <div className=" flex items-center justify-start gap-x-6">
-                 
+
                     <button to="/Home"
                         type="submit"
                         className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
